@@ -1,0 +1,38 @@
+﻿<Window x:Class="UseEntity.AddAlbums"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Пластиночки, Венильчик и Дисочки" Height="300" Width="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="10"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="5" FontSize="19" FontStyle="Oblique" FontWeight="Black" Text="Релиз" TextAlignment="Center"/>
+        <TextBox Name="AlbumBox" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" FontSize="17" FontWeight="DemiBold" Margin="5"/>
+        <TextBlock Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2" Margin="5" FontSize="19" FontStyle="Oblique" FontWeight="Black" Text="Дата релиза" TextAlignment="Center"/>
+        <TextBox Name="AlbumDateBox" Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" FontSize="17" FontWeight="DemiBold" Margin="5"/>
+        <Grid Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Name ="AlbumButton" Grid.Column="1" Margin="5" FontSize="16" FontStyle="Italic" FontWeight="DemiBold" Background="BurlyWood" Click="AddAlbum_OnClick">Add</Button>
+        </Grid>
+    </Grid>
+</Window>

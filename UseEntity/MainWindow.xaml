@@ -1,0 +1,62 @@
+﻿<Window x:Class="UseEntity.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Чек поинт в музыке" Height="350" Width="525">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="110"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="50"/>
+        </Grid.ColumnDefinitions>
+
+        <ComboBox Name="ChoiseOfSearch" Margin="5" SelectedIndex ="00">
+            <TextBlock Name="Artist" Text="Исполнитель"/>
+            <TextBlock Name="Style" Text="Жанр"/>
+            <TextBlock Name="Release" Text="Релиз"/>
+        </ComboBox>
+        <TextBox Name="SearchBox" Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Text="Что ищем" Margin="5" />
+
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20"></RowDefinition>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Жанр" Margin="2" FontSize="14" FontStyle="Oblique" FontWeight="DemiBold" TextAlignment="Center"/>
+            <TextBlock Grid.Column="1" Grid.Row="0" Text="Исполнитель" Margin="2" FontSize="14" FontStyle="Oblique" FontWeight="DemiBold" TextAlignment="Center"/>
+            <TextBlock Grid.Column="2" Grid.Row="0" Text="Релиз" Margin="2" FontSize="14" FontStyle="Oblique" FontWeight="DemiBold" TextAlignment="Center"/>
+
+            <TextBlock Name ="StyleText"  Grid.Column="0" Grid.Row="1" Margin="5" FontSize="14" FontStyle="Italic" FontWeight="DemiBold" TextWrapping="Wrap" Background="AliceBlue"/>
+            <TextBlock Name ="ArtistText"  Grid.Column="1" Grid.Row="1" Margin="5" FontSize="14" FontStyle="Italic" FontWeight="DemiBold" TextWrapping="Wrap" Background="Azure"/>
+            <TextBlock Name ="AlbumText"  Grid.Column="2" Grid.Row="1" Margin="5" FontSize="14" FontStyle="Italic" FontWeight="DemiBold" TextWrapping="Wrap" Background="Beige"/>
+
+
+        </Grid>
+
+        <Button Name ="AddButton"  Grid.Row="2" Grid.Column="0" Margin="3" FontSize="14" FontStyle="Italic" FontWeight="DemiBold" Content="Add" Click="AddButton_OnClick"/>
+        <Grid  Grid.Row="2" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Name ="Search" Grid.Column="2" Click="Search_OnClick" Margin="3" FontSize="14" FontStyle="Italic" FontWeight="DemiBold" Content="Search"/>
+        </Grid>
+
+    </Grid>
+</Window>
