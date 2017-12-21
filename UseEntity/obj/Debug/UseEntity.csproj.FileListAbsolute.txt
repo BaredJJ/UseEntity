@@ -21,3 +21,4 @@ D:\coding\WPF\UseEntity\UseEntity\obj\Debug\UseEntity.Properties.Resources.resou
 D:\coding\WPF\UseEntity\UseEntity\obj\Debug\UseEntity.csproj.GenerateResource.Cache
 D:\coding\WPF\UseEntity\UseEntity\obj\Debug\UseEntity.exe
 D:\coding\WPF\UseEntity\UseEntity\obj\Debug\UseEntity.pdb
+D:\coding\WPF\UseEntity\UseEntity\obj\Debug\UseEntity.csprojResolveAssemblyReference.cache

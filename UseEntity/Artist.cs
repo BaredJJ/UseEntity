@@ -33,5 +33,8 @@ namespace UseEntity
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Style> Styles { get; set; }
+
+        public override string ToString() => Name + " " + Appearance.Year + " " + BreackUp;
+
     }
 }

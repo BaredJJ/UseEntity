@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Linq;
@@ -16,11 +17,11 @@ namespace UseEntity
         private List<Artist> _artist;
         private List<Album> _album;
         private List<Style> _style;
-        private readonly MainWindow _mainWindow;
+        private static MainWindow _mainWindow;
         private readonly AddArtist _addArtist;
         private readonly AddAlbums _addAlbums;
         private readonly AddStyle _addStyle;
-        private readonly IMessageService _messageService = new MessageService( );
+        private static readonly IMessageService _messageService = new MessageService( );
 
         private static string _name;
 
@@ -28,9 +29,6 @@ namespace UseEntity
         public Presenter(MainWindow window)
         {
             _mainWindow = window;
-            _artist = _musicBase.Artists.ToList( );//
-            _album = _musicBase.Albums.ToList( );//
-            _style = _musicBase.Styles.ToList( );//
             _mainWindow.MainWindowEvent += MainWindow_mainWindowEvent;
             _mainWindow.AddEvent += _mainWindow_AddEvent;
         }
@@ -213,84 +211,97 @@ namespace UseEntity
                     _mainWindow.ArtistText.Text = "";
                     _mainWindow.AlbumText.Text = "";
                     _mainWindow.StyleText.Text = "";
-                    //List<List<string>> list = new List<List<string>>( );
-                    bool flag = false;
                     //TODO Надо подумать как получше сделать
-                    #region Поиск по названию
-                    if (_mainWindow.ChoiseOfSearch.SelectedIndex == 00)
-                    {
-                        foreach (var art in _artist)
+                    #region Поиск по названию                    
+
+                        if (_mainWindow.ChoiseOfSearch.SelectedIndex == 00)
                         {
-                            if (art.Name.ToUpper() == _mainWindow.SearchBox.Text.ToUpper())
+                            var result = _musicBase.Artists.FirstOrDefault(name =>
+                                name.Name.ToUpper() == _mainWindow.SearchBox.Text.ToUpper());
+                            if (result == null)
+                                EmptyMessage();
+                            else
                             {
-                                flag = true;
-                                _mainWindow.ArtistText.Text = art.Name + " " + art.Appearance.Year;
-                                foreach (var alb in _album)
-                                {
-                                    if(alb.Artist.ArtistId == art.ArtistId)
-                                        _mainWindow.AlbumText.Text += alb.Name + " " + alb.DateRelease + Environment.NewLine;
-                                }
-                                foreach (var st in _style)
-                                {
-                                    foreach (var stArtist in st.Artists)
-                                    {
-                                        if (stArtist.ArtistId == art.ArtistId)
-                                        {
-                                            _mainWindow.StyleText.Text += st.Name +Environment.NewLine;
-                                        }
-                                    }
-                                }
+                                _mainWindow.ArtistText.Text = result.ToString();
+                                ShowAlbums(result.Albums);
+                                ShowStyle(result.Styles);
                             }
                         }
-                    }
-                    #endregion
-                    #region Поиск по стилю
-                    else if (_mainWindow.ChoiseOfSearch.SelectedIndex == 1)
-                    {
-                        foreach (var st in _style)
+
+                        #endregion
+
+                        #region Поиск по стилю
+
+                        else if (_mainWindow.ChoiseOfSearch.SelectedIndex == 1)
                         {
-                            if (st.Name.ToUpper() == _mainWindow.SearchBox.Text.ToUpper())
+                            var result = _musicBase.Styles.FirstOrDefault(name =>
+                                name.Name.ToUpper() == _mainWindow.SearchBox.Text.ToUpper());
+                            if (result == null)
+                                EmptyMessage( );
+                            else
                             {
-                                flag = true;
-                                _mainWindow.StyleText.Text = st.Name;
-                                foreach (var art in st.Artists)
-                                {
-                                    _mainWindow.ArtistText.Text += art.Name + art.Appearance + Environment.NewLine;
-                                }
+                                _mainWindow.StyleText.Text = result.ToString();
+                                ShowArtist(result.Artists);
                             }
                         }
-                    }
-                    #endregion
-                    #region Поиск по Альбому
-                    else if (_mainWindow.ChoiseOfSearch.SelectedIndex == 2)
-                    {
-                        foreach (var alb in _album)
+
+                        #endregion
+
+                        #region Поиск по Альбому
+
+                        else if (_mainWindow.ChoiseOfSearch.SelectedIndex == 2)
                         {
-                            if (alb.Name.ToUpper() == _mainWindow.SearchBox.Text.ToUpper())
+                            var result = _musicBase.Albums.FirstOrDefault(name =>
+                                name.Name.ToUpper() == _mainWindow.SearchBox.Text.ToUpper());
+                            if (result == null)
+                                EmptyMessage( );
+                            else
                             {
-                                flag = true;
-                                _mainWindow.AlbumText.Text = alb.Name;
-                                _mainWindow.ArtistText.Text = alb.Artist.Name + " " + alb.Artist.Appearance.Year;
-                                foreach (var st in _style)
-                                {
-                                    foreach (var stArtist in st.Artists)
-                                    {
-                                        if (stArtist.ArtistId == alb.ArtistId)
-                                            _mainWindow.StyleText.Text += st.Name + Environment.NewLine;
-                                    }
-                                }
+                                _mainWindow.AlbumText.Text = result.ToString();
+                                _mainWindow.ArtistText.Text = result.Artist.ToString();
+                                ShowStyle(result.Artist.Styles);
                             }
                         }
-                    }
-#endregion
-                    if(!flag) _messageService.ShowMessage("Мы не нашли, то что вы ищите в базе");
+
+                        #endregion                       
+                   
                 }
+                else _messageService.ShowMessage("Вы ничего не ввели");
 
             }
             catch (Exception ex)
             {
                 _messageService.ShowError(ex.Message);
             }
+        }
+
+        private static void ShowArtist(ICollection<Artist> artists)
+        {
+            foreach (var artist in artists)
+            {
+                _mainWindow.ArtistText.Text += artist + Environment.NewLine;
+            }
+        }
+
+        private static void ShowStyle(ICollection<Style> styles)
+        {
+            foreach (var style in styles)
+            {
+                _mainWindow.StyleText.Text += style + Environment.NewLine;
+            }
+        }
+
+        private static void ShowAlbums(ICollection<Album> albums)
+        {
+            foreach (var album in albums)
+            {
+                _mainWindow.AlbumText.Text += album + Environment.NewLine;
+            }
+        }
+
+        private static void EmptyMessage()
+        {
+            _messageService.ShowMessage("Мы не нашли, то что вы ищите в базе");
         }
 
         private void _mainWindow_AddEvent(object sender, EventArgs e)

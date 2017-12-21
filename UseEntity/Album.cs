@@ -21,5 +21,7 @@ namespace UseEntity
         public DateTime? DateRelease { get; set; }
 
         public virtual Artist Artist { get; set; }
+
+        public override string ToString() => Name + " " + DateRelease;
     }
 }
