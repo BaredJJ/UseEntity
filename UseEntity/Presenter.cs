@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data.Entity.Migrations;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Data;
 
 namespace UseEntity
 {
     class Presenter
     {
         private readonly MusicBase _musicBase = new MusicBase();
-        private List<Artist> _artist;
-        private List<Album> _album;
-        private List<Style> _style;
         private static MainWindow _mainWindow;
         private readonly AddArtist _addArtist;
         private readonly AddAlbums _addAlbums;
@@ -36,23 +28,18 @@ namespace UseEntity
         public Presenter(AddArtist addArtist)
         {
             _addArtist = addArtist;
-            _artist = _musicBase.Artists.ToList( );
             _addArtist.NewGroup += _addArtist_NewGroup;
         }
 
         public Presenter(AddAlbums addAlbums)
         {
             _addAlbums = addAlbums;
-            _artist = _musicBase.Artists.ToList( );
-            _album = _musicBase.Albums.ToList( );
             _addAlbums.AddNewAlbum += _addAlbums_AddNewAlbum;
         }
 
         public Presenter(AddStyle addStyle)
         {
             _addStyle = addStyle;
-            _artist = _musicBase.Artists.ToList( );
-            _style = _musicBase.Styles.ToList( );
             _addStyle.AddNewStyle += _addStyle_AddNewStyle;
         }
         #endregion
@@ -62,34 +49,31 @@ namespace UseEntity
         {
             if (_addStyle.StyleBox.Text != "")
             {
-                Artist instance = new Artist();
-                foreach (var art in _artist)
+                var artist = _musicBase.Artists.FirstOrDefault(art =>
+                    art.Name.ToUpper( ) == _name);
+                if (artist != null)
                 {
-                    if (art.Name.ToUpper() == _name.ToUpper())
-                        instance = art;
-                }
-                string[] temp = Regex.Split(_addStyle.StyleBox.Text, @"\b[!,#,$,%,',(,),*,+,\.,/,:,;,<,=,>,?,@,[,\\,\],^,_,{,},|]+\s*|\b\s{2,}");
-                for (int i = 0; i < temp.Length; i++)
-                {
-                    bool flag = false;
-                    foreach (var style in _style)
+                    string[] temp = Regex.Split(_addStyle.StyleBox.Text,
+                        @"\b[!,#,$,%,',(,),*,+,\.,/,:,;,<,=,>,?,@,[,\\,\],^,_,{,},|]+\s*|\b\s{2,}");
+
+                    for (int i = 0; i < temp.Length; i++)
                     {
-                        if (style.Name.ToUpper() == temp[i].ToUpper())
+                        string str = temp[i].ToUpper();
+                        var style = _musicBase.Styles.FirstOrDefault(sty => sty.Name.ToUpper() == str);
+                        if (style != null)
                         {
-                            style.Artists.Add(instance);
-                            flag = true;
+                            style.Artists.Add(artist);
+                        }
+                        else
+                        {
+                            HashSet<Artist> artists = new HashSet<Artist>() {artist};
+                            _musicBase.Styles.Add(new Style() {Name = temp[i], Artists = artists });
                         }
                     }
-                    if (!flag)
-                    {
-                        Style style = new Style();
-                        style.Name = temp[i];
-                        style.Artists.Add(instance);
-                        _musicBase.Styles.Add(style);
-                    }
+                    _musicBase.SaveChanges();
+                    _addStyle.Close();
                 }
-                _musicBase.SaveChanges();
-                _addStyle.Close( );
+                else _messageService.ShowError("Не добавился введеный вами артист");
             }
             else _messageService.ShowMessage("Вы не ввели ни одного стиля");
         }
@@ -103,28 +87,28 @@ namespace UseEntity
                     Album album = new Album();
                     album.Name = _addAlbums.AlbumBox.Text;
                     album.DateRelease = GetData(_addAlbums.AlbumDateBox.Text);
-                    foreach (var art in _artist)
+                    var artist = _musicBase.Artists.FirstOrDefault(art =>
+                        art.Name.ToUpper( ) == _name);
+                    if (artist != null)
                     {
-                        if (art.Name.ToUpper() == _name.ToUpper())
+                        album.AlbumsId = artist.ArtistId;
+                        album.Artist = artist;
+                        _musicBase.Albums.Add(album);
+                        _musicBase.SaveChanges();
+                        MessageBoxResult result = _messageService.ShowExclametion("Вы ввели все альбомы?");
+                        _addAlbums.Close();
+                        if (result == MessageBoxResult.Yes)
                         {
-                            album.ArtistId = art.ArtistId;
-                            album.Artist = art;
+                            Window style = new AddStyle();
+                            style.Show();
+                        }
+                        else
+                        {
+                            Window albums = new AddAlbums();
+                            albums.Show();
                         }
                     }
-                    _musicBase.Albums.Add(album);
-                    _musicBase.SaveChanges( );
-                    MessageBoxResult result = _messageService.ShowExclametion("Вы ввели все альбомы?");
-                    _addAlbums.Close( );
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        Window style = new AddStyle( );
-                        style.Show( );
-                    }
-                    else
-                    {
-                        Window albums = new AddAlbums( );
-                        albums.Show( );
-                    }
+                    else throw new Exception("Не добавился предыдущий артист");
                 }
                 catch (Exception exception)
                 {
@@ -148,15 +132,9 @@ namespace UseEntity
             {
                 try
                 {
-                    bool flag = true;
-                    foreach (var art in _artist)//TODO тут надо перебрать циклы. Слишком их много в одном месте
-                    {
-                        if (art.Name.ToUpper() == _addArtist.ArtistBox.Text.ToUpper())
-                        {
-                            flag = false;
-                        }
-                    }
-                    if (flag)
+                    var artist = _musicBase.Artists.FirstOrDefault(art =>
+                        art.Name.ToUpper() == _addArtist.ArtistBox.Text.ToUpper());
+                    if (artist == null)
                     {
                         Artist instance = new Artist();
                         instance.Name = _addArtist.ArtistBox.Text;
@@ -171,15 +149,9 @@ namespace UseEntity
                         _musicBase.SaveChanges( );
                         _messageService.ShowMessage("Исолнитель успешно добвален в базу");
 
-                        //foreach (var artist in _artist)
-                        //{
-                        //    if (artist.Name.ToUpper() == _addArtist.ArtistBox.Text.ToUpper( ))
-                        //    {
-                        //        id = artist.ArtistId;
-                        //    }
-                        //}
                         _name = _addArtist.ArtistBox.Text;
                         _addArtist.Close( );
+
                         Window albums = new AddAlbums( );
                         albums.Show( );
                     }
